@@ -550,10 +550,10 @@ export default function MonthlyClassReportPage() {
       );
       doc.text(`Bulan: ${selectedMonth}`, 10, 43);
       doc.text(`Nama Guru: ${teacherName}`, 10, 48);
-      doc.text(`Tarikh Cetak: ${formatDateTime(new Date().toISOString())}`, 80, 48);
+      doc.text(`Tarikh Cetak: ${formatDateTime(new Date().toISOString())}`, 10, 53);
       if (brandingFooter) {
         doc.setTextColor(accent.r, accent.g, accent.b);
-        doc.text(brandingFooter, 10, 53);
+        doc.text(brandingFooter, 10, 58);
       }
 
       const head = [
@@ -578,7 +578,7 @@ export default function MonthlyClassReportPage() {
       });
 
       autoTable(doc, {
-        startY: brandingFooter ? 56 : 52,
+        startY: brandingFooter ? 61 : 56,
         head,
         body,
         theme: "grid",
@@ -804,8 +804,8 @@ export default function MonthlyClassReportPage() {
           <table className="min-w-[1400px] border-collapse text-xs">
             <thead>
               <tr>
-                <th className="sticky top-0 left-0 z-30 w-[360px] min-w-[360px] border border-amber-200 bg-amber-50 px-2 py-1 text-left">Nama</th>
                 <th className="sticky top-0 z-20 w-[56px] min-w-[56px] border border-amber-200 bg-amber-50 px-2 py-1 text-center">Bil</th>
+                <th className="sticky top-0 left-0 z-30 w-[360px] min-w-[360px] border border-amber-200 bg-amber-50 px-2 py-1 text-left">Nama</th>
                 {dayNumbers.map((day) => (
                   <th key={`day-${day}`} className="sticky top-0 z-20 border border-amber-200 bg-amber-50 px-2 py-1 text-center">
                     {day}
@@ -828,16 +828,16 @@ export default function MonthlyClassReportPage() {
                   const summary = summaryByStudentId.get(student.id);
                   return (
                     <tr key={student.id}>
+                      <td className="w-[56px] min-w-[56px] border border-amber-100 px-2 py-1 text-center align-top">{index + 1}</td>
                       <td className="sticky left-0 z-10 w-[360px] min-w-[360px] border border-amber-100 bg-white px-2 py-1 align-top">
                         <button
                           type="button"
                           onClick={() => void handleOpenStudentHistory(student)}
-                          className="block max-w-[340px] whitespace-normal break-words text-left text-xs font-medium leading-5 text-slate-900 underline"
+                          className="line-clamp-2 block max-w-[340px] whitespace-normal break-words text-left text-xs font-medium leading-5 text-slate-900 underline"
                         >
                           {student.full_name}
                         </button>
                       </td>
-                      <td className="w-[56px] min-w-[56px] border border-amber-100 px-2 py-1 text-center align-top">{index + 1}</td>
                       {dayNumbers.map((day) => (
                         <td key={`${student.id}-${day}`} className="border border-amber-100 px-2 py-1 text-center align-top">
                           {cellValues(student.id, day)}
@@ -870,8 +870,8 @@ export default function MonthlyClassReportPage() {
             <table className="min-w-[1400px] border-collapse text-xs">
               <thead>
                 <tr>
-                  <th className="w-[360px] min-w-[360px] border border-amber-200 bg-amber-50 px-2 py-1 text-left">Nama</th>
                   <th className="w-[56px] min-w-[56px] border border-amber-200 bg-amber-50 px-2 py-1 text-center">Bil</th>
+                  <th className="w-[360px] min-w-[360px] border border-amber-200 bg-amber-50 px-2 py-1 text-left">Nama</th>
                   {dayNumbers.map((day) => (
                     <th key={`male-day-${day}`} className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">
                       {day}
@@ -894,8 +894,8 @@ export default function MonthlyClassReportPage() {
                     const summary = summaryByStudentId.get(student.id);
                     return (
                       <tr key={`print-male-${student.id}`}>
-                        <td className="w-[360px] min-w-[360px] border border-amber-100 px-2 py-1 align-top">{student.full_name}</td>
                         <td className="w-[56px] min-w-[56px] border border-amber-100 px-2 py-1 text-center align-top">{index + 1}</td>
+                        <td className="w-[360px] min-w-[360px] border border-amber-100 px-2 py-1 align-top print-name-two-lines">{student.full_name}</td>
                         {dayNumbers.map((day) => (
                           <td key={`print-male-${student.id}-${day}`} className="border border-amber-100 px-2 py-1 text-center align-top">
                             {cellValues(student.id, day)}
@@ -919,8 +919,8 @@ export default function MonthlyClassReportPage() {
             <table className="min-w-[1400px] border-collapse text-xs">
               <thead>
                 <tr>
-                  <th className="w-[360px] min-w-[360px] border border-amber-200 bg-amber-50 px-2 py-1 text-left">Nama</th>
                   <th className="w-[56px] min-w-[56px] border border-amber-200 bg-amber-50 px-2 py-1 text-center">Bil</th>
+                  <th className="w-[360px] min-w-[360px] border border-amber-200 bg-amber-50 px-2 py-1 text-left">Nama</th>
                   {dayNumbers.map((day) => (
                     <th key={`female-day-${day}`} className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">
                       {day}
@@ -943,8 +943,8 @@ export default function MonthlyClassReportPage() {
                     const summary = summaryByStudentId.get(student.id);
                     return (
                       <tr key={`print-female-${student.id}`}>
-                        <td className="w-[360px] min-w-[360px] border border-amber-100 px-2 py-1 align-top">{student.full_name}</td>
                         <td className="w-[56px] min-w-[56px] border border-amber-100 px-2 py-1 text-center align-top">{index + 1}</td>
+                        <td className="w-[360px] min-w-[360px] border border-amber-100 px-2 py-1 align-top print-name-two-lines">{student.full_name}</td>
                         {dayNumbers.map((day) => (
                           <td key={`print-female-${student.id}-${day}`} className="border border-amber-100 px-2 py-1 text-center align-top">
                             {cellValues(student.id, day)}
@@ -1034,11 +1034,30 @@ export default function MonthlyClassReportPage() {
 
           .print-only {
             display: block !important;
+            break-inside: avoid-page;
+            page-break-inside: avoid;
           }
 
           .print-page-break {
-            break-before: page;
-            page-break-before: always;
+            break-before: page !important;
+            page-break-before: always !important;
+          }
+
+          .print-name-two-lines {
+            white-space: normal !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.25 !important;
+            max-height: 2.5em;
+          }
+
+          .print-only > div {
+            overflow: visible !important;
+          }
+
+          .print-only table {
+            min-width: 0 !important;
+            width: 100% !important;
           }
 
           table {
