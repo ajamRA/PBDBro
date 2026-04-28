@@ -254,37 +254,40 @@ export default function DashboardPage() {
     <main className="min-h-screen">
       <div className="mx-auto w-full max-w-6xl px-4 py-8">
       <div className="rounded-2xl border border-[#dce8d5] bg-[#fcfdf8] p-6 shadow-sm">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Kelas</h1>
             <p className="mt-1 text-sm text-slate-600">Urus kelas dan murid anda</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/subjects"
-              className="rounded-lg border border-[#cfe0c6] bg-white px-3 py-2 text-sm text-slate-700 hover:bg-[#f4f8ef]"
-            >
-              Subjects
-            </Link>
-            <Link
-              href="/logs"
-              className="rounded-lg border border-[#cfe0c6] bg-white px-3 py-2 text-sm text-slate-700 hover:bg-[#f4f8ef]"
-            >
-              Log Padam
-            </Link>
-            <Link
-              href="/settings"
-              className="rounded-lg border border-[#cfe0c6] bg-white px-3 py-2 text-sm text-slate-700 hover:bg-[#f4f8ef]"
-            >
-              Tetapan
-            </Link>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="rounded-lg border border-[#cfe0c6] bg-white px-3 py-2 text-sm text-slate-700 hover:bg-[#f4f8ef]"
-            >
-              Logout
-            </button>
+          <div className="grid gap-1">
+            <p className="text-right text-[11px] font-medium uppercase tracking-wide text-slate-500">Navigasi</p>
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <Link
+                href="/subjects"
+                className="rounded-lg border border-[#cfe0c6] bg-white px-3 py-2 text-sm text-slate-700 hover:bg-[#f4f8ef]"
+              >
+                Subjects
+              </Link>
+              <Link
+                href="/settings"
+                className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white"
+              >
+                Tetapan
+              </Link>
+              <Link
+                href="/logs"
+                className="rounded-lg border border-[#cfe0c6] bg-white px-3 py-2 text-sm text-slate-700 hover:bg-[#f4f8ef]"
+              >
+                Log Padam
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
 

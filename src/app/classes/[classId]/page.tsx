@@ -972,6 +972,10 @@ export default function ClassStudentsPage() {
               Fokus utama: senarai murid kelas semasa.
             </p>
           </div>
+          <div className="w-full sm:w-auto">
+            <p className="mb-1 text-left text-[11px] font-medium uppercase tracking-wide text-slate-500 sm:text-right">
+              Aksi Kelas
+            </p>
           <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-stretch sm:justify-end">
             <button
               type="button"
@@ -983,31 +987,32 @@ export default function ClassStudentsPage() {
             <button
               type="button"
               onClick={openSetupSubjectModal}
-              className="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-center text-sm sm:flex-none sm:whitespace-nowrap"
+              className="min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 text-center text-sm sm:flex-none sm:whitespace-nowrap"
             >
               Setup Subjek Kelas
             </button>
             <Link
               href={`/classes/${classId}/reports/monthly`}
               onClick={() => setNavigatingLabel("Membuka laporan bulanan...")}
-              className="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-center text-sm sm:flex-none sm:whitespace-nowrap"
+              className="min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 text-center text-sm sm:flex-none sm:whitespace-nowrap"
             >
               Cetak Laporan Bulanan
             </Link>
             <Link
               href="/logs"
               onClick={() => setNavigatingLabel("Membuka log padam...")}
-              className="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-center text-sm sm:flex-none sm:whitespace-nowrap"
+              className="min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 text-center text-sm sm:flex-none sm:whitespace-nowrap"
             >
               Log Padam
             </Link>
             <Link
               href="/dashboard"
               onClick={() => setNavigatingLabel("Kembali ke dashboard...")}
-              className="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-center text-sm sm:flex-none sm:whitespace-nowrap"
+              className="min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 text-center text-sm sm:flex-none sm:whitespace-nowrap"
             >
               Kembali Dashboard
             </Link>
+          </div>
           </div>
         </div>
 

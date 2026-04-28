@@ -801,11 +801,11 @@ export default function MonthlyClassReportPage() {
         ) : null}
 
         <section className="screen-report mt-4 overflow-auto rounded-md border border-slate-200">
-          <table className="min-w-full border-collapse text-xs">
+          <table className="min-w-[1400px] border-collapse text-xs">
             <thead>
               <tr>
-                <th className="sticky top-0 left-0 z-30 border border-amber-200 bg-amber-50 px-2 py-1 text-left">Nama</th>
-                <th className="sticky top-0 z-20 border border-amber-200 bg-amber-50 px-2 py-1 text-center">Bil</th>
+                <th className="sticky top-0 left-0 z-30 w-[360px] min-w-[360px] border border-amber-200 bg-amber-50 px-2 py-1 text-left">Nama</th>
+                <th className="sticky top-0 z-20 w-[56px] min-w-[56px] border border-amber-200 bg-amber-50 px-2 py-1 text-center">Bil</th>
                 {dayNumbers.map((day) => (
                   <th key={`day-${day}`} className="sticky top-0 z-20 border border-amber-200 bg-amber-50 px-2 py-1 text-center">
                     {day}
@@ -828,25 +828,25 @@ export default function MonthlyClassReportPage() {
                   const summary = summaryByStudentId.get(student.id);
                   return (
                     <tr key={student.id}>
-                      <td className="sticky left-0 z-10 border border-amber-100 bg-white px-2 py-1">
+                      <td className="sticky left-0 z-10 w-[360px] min-w-[360px] border border-amber-100 bg-white px-2 py-1 align-top">
                         <button
                           type="button"
                           onClick={() => void handleOpenStudentHistory(student)}
-                          className="text-left text-xs font-medium text-slate-900 underline"
+                          className="block max-w-[340px] whitespace-normal break-words text-left text-xs font-medium leading-5 text-slate-900 underline"
                         >
                           {student.full_name}
                         </button>
                       </td>
-                      <td className="border border-amber-100 px-2 py-1 text-center">{index + 1}</td>
+                      <td className="w-[56px] min-w-[56px] border border-amber-100 px-2 py-1 text-center align-top">{index + 1}</td>
                       {dayNumbers.map((day) => (
-                        <td key={`${student.id}-${day}`} className="border border-amber-100 px-2 py-1 text-center">
+                        <td key={`${student.id}-${day}`} className="border border-amber-100 px-2 py-1 text-center align-top">
                           {cellValues(student.id, day)}
                         </td>
                       ))}
-                      <td className="border border-amber-100 px-2 py-1 text-center">{summary?.first ?? "—"}</td>
-                      <td className="border border-amber-100 px-2 py-1 text-center">{summary?.last ?? "—"}</td>
+                      <td className="border border-amber-100 px-2 py-1 text-center align-top">{summary?.first ?? "—"}</td>
+                      <td className="border border-amber-100 px-2 py-1 text-center align-top">{summary?.last ?? "—"}</td>
                       <td
-                        className={`border border-amber-100 px-2 py-1 text-center font-semibold ${
+                        className={`border border-amber-100 px-2 py-1 text-center align-top font-semibold ${
                           summary?.trend === "↑"
                             ? "text-emerald-700"
                             : summary?.trend === "↓"
@@ -867,11 +867,11 @@ export default function MonthlyClassReportPage() {
         <section className="print-only mt-4">
           <h3 className="mb-2 text-sm font-semibold" style={{ color: brandingPrimaryColor }}>Lelaki</h3>
           <div className="overflow-auto rounded-md border border-slate-200">
-            <table className="min-w-full border-collapse text-xs">
+            <table className="min-w-[1400px] border-collapse text-xs">
               <thead>
                 <tr>
-                  <th className="border border-amber-200 bg-amber-50 px-2 py-1 text-left">Nama</th>
-                  <th className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">Bil</th>
+                  <th className="w-[360px] min-w-[360px] border border-amber-200 bg-amber-50 px-2 py-1 text-left">Nama</th>
+                  <th className="w-[56px] min-w-[56px] border border-amber-200 bg-amber-50 px-2 py-1 text-center">Bil</th>
                   {dayNumbers.map((day) => (
                     <th key={`male-day-${day}`} className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">
                       {day}
@@ -894,16 +894,16 @@ export default function MonthlyClassReportPage() {
                     const summary = summaryByStudentId.get(student.id);
                     return (
                       <tr key={`print-male-${student.id}`}>
-                        <td className="border border-amber-100 px-2 py-1">{student.full_name}</td>
-                        <td className="border border-amber-100 px-2 py-1 text-center">{index + 1}</td>
+                        <td className="w-[360px] min-w-[360px] border border-amber-100 px-2 py-1 align-top">{student.full_name}</td>
+                        <td className="w-[56px] min-w-[56px] border border-amber-100 px-2 py-1 text-center align-top">{index + 1}</td>
                         {dayNumbers.map((day) => (
-                          <td key={`print-male-${student.id}-${day}`} className="border border-amber-100 px-2 py-1 text-center">
+                          <td key={`print-male-${student.id}-${day}`} className="border border-amber-100 px-2 py-1 text-center align-top">
                             {cellValues(student.id, day)}
                           </td>
                         ))}
-                        <td className="border border-amber-100 px-2 py-1 text-center">{summary?.first ?? "—"}</td>
-                        <td className="border border-amber-100 px-2 py-1 text-center">{summary?.last ?? "—"}</td>
-                        <td className="border border-amber-100 px-2 py-1 text-center">{summary?.trend ?? "—"}</td>
+                        <td className="border border-amber-100 px-2 py-1 text-center align-top">{summary?.first ?? "—"}</td>
+                        <td className="border border-amber-100 px-2 py-1 text-center align-top">{summary?.last ?? "—"}</td>
+                        <td className="border border-amber-100 px-2 py-1 text-center align-top">{summary?.trend ?? "—"}</td>
                       </tr>
                     );
                   })
@@ -916,11 +916,11 @@ export default function MonthlyClassReportPage() {
         <section className="print-only print-page-break mt-4">
           <h3 className="mb-2 text-sm font-semibold" style={{ color: brandingPrimaryColor }}>Perempuan</h3>
           <div className="overflow-auto rounded-md border border-slate-200">
-            <table className="min-w-full border-collapse text-xs">
+            <table className="min-w-[1400px] border-collapse text-xs">
               <thead>
                 <tr>
-                  <th className="border border-amber-200 bg-amber-50 px-2 py-1 text-left">Nama</th>
-                  <th className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">Bil</th>
+                  <th className="w-[360px] min-w-[360px] border border-amber-200 bg-amber-50 px-2 py-1 text-left">Nama</th>
+                  <th className="w-[56px] min-w-[56px] border border-amber-200 bg-amber-50 px-2 py-1 text-center">Bil</th>
                   {dayNumbers.map((day) => (
                     <th key={`female-day-${day}`} className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">
                       {day}
@@ -943,16 +943,16 @@ export default function MonthlyClassReportPage() {
                     const summary = summaryByStudentId.get(student.id);
                     return (
                       <tr key={`print-female-${student.id}`}>
-                        <td className="border border-amber-100 px-2 py-1">{student.full_name}</td>
-                        <td className="border border-amber-100 px-2 py-1 text-center">{index + 1}</td>
+                        <td className="w-[360px] min-w-[360px] border border-amber-100 px-2 py-1 align-top">{student.full_name}</td>
+                        <td className="w-[56px] min-w-[56px] border border-amber-100 px-2 py-1 text-center align-top">{index + 1}</td>
                         {dayNumbers.map((day) => (
-                          <td key={`print-female-${student.id}-${day}`} className="border border-amber-100 px-2 py-1 text-center">
+                          <td key={`print-female-${student.id}-${day}`} className="border border-amber-100 px-2 py-1 text-center align-top">
                             {cellValues(student.id, day)}
                           </td>
                         ))}
-                        <td className="border border-amber-100 px-2 py-1 text-center">{summary?.first ?? "—"}</td>
-                        <td className="border border-amber-100 px-2 py-1 text-center">{summary?.last ?? "—"}</td>
-                        <td className="border border-amber-100 px-2 py-1 text-center">{summary?.trend ?? "—"}</td>
+                        <td className="border border-amber-100 px-2 py-1 text-center align-top">{summary?.first ?? "—"}</td>
+                        <td className="border border-amber-100 px-2 py-1 text-center align-top">{summary?.last ?? "—"}</td>
+                        <td className="border border-amber-100 px-2 py-1 text-center align-top">{summary?.trend ?? "—"}</td>
                       </tr>
                     );
                   })
@@ -1051,6 +1051,8 @@ export default function MonthlyClassReportPage() {
             font-size: 10px !important;
             padding: 2px 3px !important;
             white-space: nowrap;
+            vertical-align: top;
+            line-height: 1.35 !important;
           }
 
           thead {
