@@ -13,6 +13,18 @@ type Workspace = {
   name: string;
 };
 
+type WorkspaceBranding = {
+  logo_url: string | null;
+  school_name: string | null;
+  report_title: string | null;
+  report_subtitle: string | null;
+  header_line_1: string | null;
+  header_line_2: string | null;
+  footer_note: string | null;
+  primary_color: string | null;
+  accent_color: string | null;
+};
+
 type ClassInfo = {
   id: string;
   name: string;
@@ -23,6 +35,7 @@ type ClassInfo = {
 type Student = {
   id: string;
   full_name: string;
+  gender?: string | null;
 };
 
 type SubjectItem = {
@@ -91,6 +104,36 @@ function formatDateTime(value: string | null) {
   return date.toLocaleString("ms-MY");
 }
 
+async function imageUrlToDataUrl(url: string) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error("Gagal load logo image.");
+  }
+  const blob = await response.blob();
+  const dataUrl = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(String(reader.result ?? ""));
+    reader.onerror = () => reject(new Error("Gagal convert image ke data URL."));
+    reader.readAsDataURL(blob);
+  });
+  return dataUrl;
+}
+
+function normalizeName(value: string) {
+  return value.replace(/\s+/g, " ").trim().toUpperCase();
+}
+
+function getStudentGenderGroup(student: Student): "male" | "female" {
+  const rawGender = String(student.gender ?? "").trim().toLowerCase();
+  if (["lelaki", "l", "male", "m"].includes(rawGender)) return "male";
+  if (["perempuan", "p", "female", "f"].includes(rawGender)) return "female";
+
+  const text = normalizeName(student.full_name);
+  if (/\bBIN\b/.test(text) || /\bA\/L\b/.test(text)) return "male";
+  if (/\bBINTI\b/.test(text) || /\bA\/P\b/.test(text)) return "female";
+  return "female";
+}
+
 export default function MonthlyClassReportPage() {
   const router = useRouter();
   const params = useParams<{ classId: string }>();
@@ -106,6 +149,7 @@ export default function MonthlyClassReportPage() {
   const [user, setUser] = useState<User | null>(null);
   const [teacherName, setTeacherName] = useState("-");
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
+  const [branding, setBranding] = useState<WorkspaceBranding | null>(null);
   const [classInfo, setClassInfo] = useState<ClassInfo | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [subjects, setSubjects] = useState<SubjectItem[]>([]);
@@ -152,6 +196,15 @@ export default function MonthlyClassReportPage() {
       }
       setWorkspace(ws);
 
+      const { data: brandingRow } = await supabase
+        .from("workspace_settings")
+        .select(
+          "logo_url, school_name, report_title, report_subtitle, header_line_1, header_line_2, footer_note, primary_color, accent_color",
+        )
+        .eq("workspace_id", ws.id)
+        .maybeSingle();
+      setBranding((brandingRow as WorkspaceBranding | null) ?? null);
+
       const { data: profileRow } = await supabase
         .from("profiles")
         .select("display_name, email")
@@ -188,7 +241,7 @@ export default function MonthlyClassReportPage() {
 
       const { data: studentRows, error: studentsError } = await supabase
         .from("students")
-        .select("id, full_name")
+        .select("id, full_name, gender")
         .eq("workspace_id", ws.id)
         .eq("class_id", classId)
         .order("full_name", { ascending: true });
@@ -388,6 +441,30 @@ export default function MonthlyClassReportPage() {
 
   const selectedSubject = subjects.find((subject) => subject.id === selectedSubjectId) ?? null;
   const selectedSkill = skills.find((skill) => skill.id === selectedSkillId) ?? null;
+  const brandingPrimaryColor = branding?.primary_color ?? "#0f1d3c";
+  const brandingAccentColor = branding?.accent_color ?? "#ff8e2b";
+  const brandingTitle = branding?.report_title?.trim() || "Perkembangan Murid (Jadual Bulanan)";
+  const brandingSubtitle = branding?.report_subtitle?.trim() || "";
+  const brandingHeader1 = branding?.header_line_1?.trim() || "";
+  const brandingHeader2 = branding?.header_line_2?.trim() || "";
+  const brandingFooter = branding?.footer_note?.trim() || "";
+
+  const summaryByStudentId = useMemo(() => {
+    const map = new Map<string, { first: string; last: string; trend: string }>();
+    for (const row of summaryRows) {
+      map.set(row.studentId, { first: row.first, last: row.last, trend: row.trend });
+    }
+    return map;
+  }, [summaryRows]);
+
+  const maleStudents = useMemo(
+    () => students.filter((student) => getStudentGenderGroup(student) === "male"),
+    [students],
+  );
+  const femaleStudents = useMemo(
+    () => students.filter((student) => getStudentGenderGroup(student) === "female"),
+    [students],
+  );
 
   const handleOpenStudentHistory = async (student: Student) => {
     if (!workspace || !selectedSubjectId || !selectedSkillId) return;
@@ -427,18 +504,57 @@ export default function MonthlyClassReportPage() {
 
     try {
       const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      const hexToRgb = (hex: string) => {
+        const safe = /^#[0-9A-Fa-f]{6}$/.test(hex) ? hex : "#0f1d3c";
+        return {
+          r: Number.parseInt(safe.slice(1, 3), 16),
+          g: Number.parseInt(safe.slice(3, 5), 16),
+          b: Number.parseInt(safe.slice(5, 7), 16),
+        };
+      };
+      const primary = hexToRgb(brandingPrimaryColor);
+      const accent = hexToRgb(brandingAccentColor);
+
+      let startX = 10;
+      if (branding?.logo_url) {
+        try {
+          const dataUrl = await imageUrlToDataUrl(branding.logo_url);
+          doc.addImage(dataUrl, "PNG", 10, 8, 14, 14);
+          startX = 28;
+        } catch {
+          // ignore logo failure, continue PDF
+        }
+      }
+
+      doc.setTextColor(primary.r, primary.g, primary.b);
       doc.setFontSize(14);
-      doc.text("Perkembangan Murid (Jadual Bulanan)", 10, 10);
+      doc.text(brandingTitle, startX, 11);
+      if (brandingSubtitle) {
+        doc.setFontSize(10);
+        doc.text(brandingSubtitle, startX, 16);
+      }
+      if (brandingHeader1) {
+        doc.setFontSize(10);
+        doc.text(brandingHeader1, startX, 21);
+      }
+      if (brandingHeader2) {
+        doc.setFontSize(10);
+        doc.text(brandingHeader2, startX, 26);
+      }
       doc.setFontSize(10);
-      doc.text(`Kelas: ${classInfo.name}`, 10, 16);
+      doc.text(`Kelas: ${classInfo.name}`, 10, 33);
       doc.text(
         `Subjek: ${selectedSubject.name}${selectedSubject.code ? ` [${selectedSubject.code}]` : ""} | Tahun: ${classInfo.year_label} | Kemahiran: ${selectedSkill.name}`,
         10,
-        21,
+        38,
       );
-      doc.text(`Bulan: ${selectedMonth}`, 10, 26);
-      doc.text(`Nama Guru: ${teacherName}`, 10, 31);
-      doc.text(`Tarikh Cetak: ${formatDateTime(new Date().toISOString())}`, 80, 31);
+      doc.text(`Bulan: ${selectedMonth}`, 10, 43);
+      doc.text(`Nama Guru: ${teacherName}`, 10, 48);
+      doc.text(`Tarikh Cetak: ${formatDateTime(new Date().toISOString())}`, 80, 48);
+      if (brandingFooter) {
+        doc.setTextColor(accent.r, accent.g, accent.b);
+        doc.text(brandingFooter, 10, 53);
+      }
 
       const head = [
         [
@@ -462,12 +578,12 @@ export default function MonthlyClassReportPage() {
       });
 
       autoTable(doc, {
-        startY: 35,
+        startY: brandingFooter ? 56 : 52,
         head,
         body,
         theme: "grid",
         styles: { fontSize: 6.5, cellPadding: 1.2 },
-        headStyles: { fillColor: [250, 241, 220], textColor: [0, 0, 0] },
+        headStyles: { fillColor: [accent.r, accent.g, accent.b], textColor: [255, 255, 255] },
         columnStyles: { 0: { cellWidth: 55 } },
       });
 
@@ -553,7 +669,8 @@ export default function MonthlyClassReportPage() {
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="no-print flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-xl font-semibold">Laporan Bulanan</h1>
+            <h1 className="text-xl font-semibold">{brandingTitle}</h1>
+            {brandingSubtitle ? <p className="mt-1 text-sm text-slate-600">{brandingSubtitle}</p> : null}
             <p className="mt-1 text-sm text-slate-600">Klik nama murid untuk lihat sejarah detail.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -644,6 +761,19 @@ export default function MonthlyClassReportPage() {
         </section>
 
         <section className="mt-3 rounded-md border border-slate-200 p-2 text-sm">
+          {(branding?.logo_url || branding?.school_name || brandingHeader1 || brandingHeader2) ? (
+            <div className="mb-2 flex flex-wrap items-start gap-3 border-b border-slate-200 pb-2">
+              {branding?.logo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={branding.logo_url} alt="Logo sekolah" className="h-14 w-14 rounded object-contain" />
+              ) : null}
+              <div className="min-w-0">
+                {branding?.school_name ? <p className="font-semibold">{branding.school_name}</p> : null}
+                {brandingHeader1 ? <p>{brandingHeader1}</p> : null}
+                {brandingHeader2 ? <p>{brandingHeader2}</p> : null}
+              </div>
+            </div>
+          ) : null}
           <p><span className="font-medium">Kelas:</span> {classInfo?.name ?? "-"}</p>
           <p>
             <span className="font-medium">Subjek:</span>{" "}
@@ -657,6 +787,7 @@ export default function MonthlyClassReportPage() {
           <p className="mt-1 text-xs text-slate-500">
             Nota: Kosong = tiada data (tarikh belum tiba), “—” = belum taksir.
           </p>
+          {brandingFooter ? <p className="mt-1 text-xs font-medium" style={{ color: brandingAccentColor }}>{brandingFooter}</p> : null}
         </section>
 
         {subjects.length === 0 ? (
@@ -669,7 +800,7 @@ export default function MonthlyClassReportPage() {
           <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">Memuatkan data laporan...</p>
         ) : null}
 
-        <section className="mt-4 overflow-auto rounded-md border border-slate-200">
+        <section className="screen-report mt-4 overflow-auto rounded-md border border-slate-200">
           <table className="min-w-full border-collapse text-xs">
             <thead>
               <tr>
@@ -694,7 +825,7 @@ export default function MonthlyClassReportPage() {
                 </tr>
               ) : (
                 students.map((student, index) => {
-                  const summary = summaryRows.find((row) => row.studentId === student.id);
+                  const summary = summaryByStudentId.get(student.id);
                   return (
                     <tr key={student.id}>
                       <td className="sticky left-0 z-10 border border-amber-100 bg-white px-2 py-1">
@@ -731,6 +862,104 @@ export default function MonthlyClassReportPage() {
               )}
             </tbody>
           </table>
+        </section>
+
+        <section className="print-only mt-4">
+          <h3 className="mb-2 text-sm font-semibold" style={{ color: brandingPrimaryColor }}>Lelaki</h3>
+          <div className="overflow-auto rounded-md border border-slate-200">
+            <table className="min-w-full border-collapse text-xs">
+              <thead>
+                <tr>
+                  <th className="border border-amber-200 bg-amber-50 px-2 py-1 text-left">Nama</th>
+                  <th className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">Bil</th>
+                  {dayNumbers.map((day) => (
+                    <th key={`male-day-${day}`} className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">
+                      {day}
+                    </th>
+                  ))}
+                  <th className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">First</th>
+                  <th className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">Last</th>
+                  <th className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">Trend</th>
+                </tr>
+              </thead>
+              <tbody>
+                {maleStudents.length === 0 ? (
+                  <tr>
+                    <td colSpan={dayCount + 6} className="border border-amber-100 px-2 py-2 text-slate-600">
+                      Tiada murid lelaki.
+                    </td>
+                  </tr>
+                ) : (
+                  maleStudents.map((student, index) => {
+                    const summary = summaryByStudentId.get(student.id);
+                    return (
+                      <tr key={`print-male-${student.id}`}>
+                        <td className="border border-amber-100 px-2 py-1">{student.full_name}</td>
+                        <td className="border border-amber-100 px-2 py-1 text-center">{index + 1}</td>
+                        {dayNumbers.map((day) => (
+                          <td key={`print-male-${student.id}-${day}`} className="border border-amber-100 px-2 py-1 text-center">
+                            {cellValues(student.id, day)}
+                          </td>
+                        ))}
+                        <td className="border border-amber-100 px-2 py-1 text-center">{summary?.first ?? "—"}</td>
+                        <td className="border border-amber-100 px-2 py-1 text-center">{summary?.last ?? "—"}</td>
+                        <td className="border border-amber-100 px-2 py-1 text-center">{summary?.trend ?? "—"}</td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="print-only print-page-break mt-4">
+          <h3 className="mb-2 text-sm font-semibold" style={{ color: brandingPrimaryColor }}>Perempuan</h3>
+          <div className="overflow-auto rounded-md border border-slate-200">
+            <table className="min-w-full border-collapse text-xs">
+              <thead>
+                <tr>
+                  <th className="border border-amber-200 bg-amber-50 px-2 py-1 text-left">Nama</th>
+                  <th className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">Bil</th>
+                  {dayNumbers.map((day) => (
+                    <th key={`female-day-${day}`} className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">
+                      {day}
+                    </th>
+                  ))}
+                  <th className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">First</th>
+                  <th className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">Last</th>
+                  <th className="border border-amber-200 bg-amber-50 px-2 py-1 text-center">Trend</th>
+                </tr>
+              </thead>
+              <tbody>
+                {femaleStudents.length === 0 ? (
+                  <tr>
+                    <td colSpan={dayCount + 6} className="border border-amber-100 px-2 py-2 text-slate-600">
+                      Tiada murid perempuan.
+                    </td>
+                  </tr>
+                ) : (
+                  femaleStudents.map((student, index) => {
+                    const summary = summaryByStudentId.get(student.id);
+                    return (
+                      <tr key={`print-female-${student.id}`}>
+                        <td className="border border-amber-100 px-2 py-1">{student.full_name}</td>
+                        <td className="border border-amber-100 px-2 py-1 text-center">{index + 1}</td>
+                        {dayNumbers.map((day) => (
+                          <td key={`print-female-${student.id}-${day}`} className="border border-amber-100 px-2 py-1 text-center">
+                            {cellValues(student.id, day)}
+                          </td>
+                        ))}
+                        <td className="border border-amber-100 px-2 py-1 text-center">{summary?.first ?? "—"}</td>
+                        <td className="border border-amber-100 px-2 py-1 text-center">{summary?.last ?? "—"}</td>
+                        <td className="border border-amber-100 px-2 py-1 text-center">{summary?.trend ?? "—"}</td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </section>
       </div>
 
@@ -780,6 +1009,10 @@ export default function MonthlyClassReportPage() {
       ) : null}
 
       <style jsx global>{`
+        .print-only {
+          display: none;
+        }
+
         @media print {
           @page {
             size: A4 landscape;
@@ -793,6 +1026,19 @@ export default function MonthlyClassReportPage() {
 
           .no-print {
             display: none !important;
+          }
+
+          .screen-report {
+            display: none !important;
+          }
+
+          .print-only {
+            display: block !important;
+          }
+
+          .print-page-break {
+            break-before: page;
+            page-break-before: always;
           }
 
           table {

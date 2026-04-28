@@ -109,6 +109,7 @@ export default function ClassStudentsPage() {
   const [classEditModalOpen, setClassEditModalOpen] = useState(false);
   const [updatingStudentId, setUpdatingStudentId] = useState<string | null>(null);
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
+  const [navigatingLabel, setNavigatingLabel] = useState("");
 
   const [error, setError] = useState("");
   const [classDeleteError, setClassDeleteError] = useState("");
@@ -988,18 +989,21 @@ export default function ClassStudentsPage() {
             </button>
             <Link
               href={`/classes/${classId}/reports/monthly`}
+              onClick={() => setNavigatingLabel("Membuka laporan bulanan...")}
               className="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-center text-sm sm:flex-none sm:whitespace-nowrap"
             >
               Cetak Laporan Bulanan
             </Link>
             <Link
               href="/logs"
+              onClick={() => setNavigatingLabel("Membuka log padam...")}
               className="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-center text-sm sm:flex-none sm:whitespace-nowrap"
             >
               Log Padam
             </Link>
             <Link
               href="/dashboard"
+              onClick={() => setNavigatingLabel("Kembali ke dashboard...")}
               className="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-center text-sm sm:flex-none sm:whitespace-nowrap"
             >
               Kembali Dashboard
@@ -1117,6 +1121,7 @@ export default function ClassStudentsPage() {
                     </div>
                     <Link
                       href={`/classes/${classId}/subjects/${subject.id}/assessments`}
+                      onClick={() => setNavigatingLabel(`Membuka assessment ${subject.name}...`)}
                       className="rounded-md border border-slate-300 px-3 py-2 text-sm"
                     >
                       Buka Assessment
@@ -1128,6 +1133,13 @@ export default function ClassStudentsPage() {
           )}
         </section>
       </div>
+      {navigatingLabel ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 shadow-lg">
+            {navigatingLabel}
+          </div>
+        </div>
+      ) : null}
 
       {classEditModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">

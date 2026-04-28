@@ -43,6 +43,7 @@ export default function DashboardPage() {
   const [yearFilter, setYearFilter] = useState("all");
   const [isAddClassOpen, setIsAddClassOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(true);
+  const [navigatingClassId, setNavigatingClassId] = useState<string | null>(null);
   const [onboardingStats, setOnboardingStats] = useState<OnboardingStats>({
     classCount: 0,
     studentCount: 0,
@@ -271,6 +272,12 @@ export default function DashboardPage() {
             >
               Log Padam
             </Link>
+            <Link
+              href="/settings"
+              className="rounded-lg border border-[#cfe0c6] bg-white px-3 py-2 text-sm text-slate-700 hover:bg-[#f4f8ef]"
+            >
+              Tetapan
+            </Link>
             <button
               type="button"
               onClick={handleLogout}
@@ -482,6 +489,7 @@ export default function DashboardPage() {
                     <Link
                       key={item.id}
                       href={`/classes/${item.id}`}
+                      onClick={() => setNavigatingClassId(item.id)}
                       className="group rounded-2xl border border-[#d8e5d2] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[#b9d2ad] hover:shadow-md"
                     >
                       <div className="space-y-2">
@@ -494,6 +502,9 @@ export default function DashboardPage() {
                         <p className="text-xs text-slate-500">
                           Murid: {classStudentCounts[item.id] ?? 0}
                         </p>
+                        {navigatingClassId === item.id ? (
+                          <p className="text-xs font-medium text-amber-700">Membuka kelas...</p>
+                        ) : null}
                       </div>
                     </Link>
                   ))}
@@ -503,6 +514,13 @@ export default function DashboardPage() {
           )}
         </section>
       </div>
+      {navigatingClassId ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 shadow-lg">
+            Sedang buka kelas. Sila tunggu...
+          </div>
+        </div>
+      ) : null}
       </div>
     </main>
   );
