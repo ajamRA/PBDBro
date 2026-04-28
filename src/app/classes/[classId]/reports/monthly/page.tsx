@@ -1016,12 +1016,32 @@ export default function MonthlyClassReportPage() {
         @media print {
           @page {
             size: A4 landscape;
-            margin: 8mm;
+            margin: 6mm;
           }
 
           body {
             background: #fff !important;
             color: #000 !important;
+          }
+
+          main,
+          main > div,
+          section,
+          .rounded-xl,
+          .rounded-md,
+          .shadow-sm,
+          .shadow-xl {
+            background: #fff !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+          }
+
+          main > div {
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
           }
 
           .no-print {
@@ -1063,15 +1083,23 @@ export default function MonthlyClassReportPage() {
           table {
             width: 100%;
             table-layout: fixed;
+            border-collapse: collapse !important;
           }
 
           th,
           td {
-            font-size: 10px !important;
-            padding: 2px 3px !important;
+            font-size: 8px !important;
+            padding: 1px 2px !important;
             white-space: nowrap;
             vertical-align: top;
-            line-height: 1.35 !important;
+            line-height: 1.2 !important;
+            color: #000 !important;
+            background: #fff !important;
+            border: 1px solid #d2b48c !important;
+          }
+
+          th {
+            font-weight: 700 !important;
           }
 
           thead {
