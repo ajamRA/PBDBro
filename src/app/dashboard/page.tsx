@@ -270,9 +270,9 @@ export default function DashboardPage() {
               </Link>
               <Link
                 href="/settings"
-                className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white"
+                className="rounded-lg bg-[#ff7a1a] px-3 py-2 text-sm font-semibold text-white shadow-md shadow-orange-300/70 hover:bg-[#f06a0b]"
               >
-                Tetapan
+                Tetapan Utama
               </Link>
               <Link
                 href="/logs"
@@ -283,7 +283,7 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100"
+                className="rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700"
               >
                 Logout
               </button>
