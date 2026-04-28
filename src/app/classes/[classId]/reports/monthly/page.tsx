@@ -666,7 +666,7 @@ export default function MonthlyClassReportPage() {
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-[96vw] px-4 py-8">
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="report-shell rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="no-print flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-xl font-semibold">{brandingTitle}</h1>
@@ -704,8 +704,8 @@ export default function MonthlyClassReportPage() {
           </div>
         </div>
 
-        {error ? <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
-        {success ? <p className="mt-3 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{success}</p> : null}
+        {error ? <p className="no-print mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
+        {success ? <p className="no-print mt-3 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{success}</p> : null}
 
         <section className="no-print mt-4 grid gap-3 rounded-md border border-slate-200 p-3 md:grid-cols-3">
           <div className="space-y-1">
@@ -801,7 +801,7 @@ export default function MonthlyClassReportPage() {
         ) : null}
 
         <section className="screen-report mt-4 overflow-auto rounded-md border border-slate-200">
-          <table className="min-w-[1400px] border-collapse text-xs">
+          <table className="min-w-full border-collapse text-xs">
             <thead>
               <tr>
                 <th className="sticky top-0 z-20 w-[56px] min-w-[56px] border border-amber-200 bg-amber-50 px-2 py-1 text-center">Bil</th>
@@ -867,7 +867,7 @@ export default function MonthlyClassReportPage() {
         <section className="print-only mt-4">
           <h3 className="mb-2 text-sm font-semibold" style={{ color: brandingPrimaryColor }}>Lelaki</h3>
           <div className="overflow-auto rounded-md border border-slate-200">
-            <table className="min-w-[1400px] border-collapse text-xs">
+            <table className="min-w-full border-collapse text-xs">
               <thead>
                 <tr>
                   <th className="w-[56px] min-w-[56px] border border-amber-200 bg-amber-50 px-2 py-1 text-center">Bil</th>
@@ -916,7 +916,7 @@ export default function MonthlyClassReportPage() {
         <section className="print-only print-page-break mt-4">
           <h3 className="mb-2 text-sm font-semibold" style={{ color: brandingPrimaryColor }}>Perempuan</h3>
           <div className="overflow-auto rounded-md border border-slate-200">
-            <table className="min-w-[1400px] border-collapse text-xs">
+            <table className="min-w-full border-collapse text-xs">
               <thead>
                 <tr>
                   <th className="w-[56px] min-w-[56px] border border-amber-200 bg-amber-50 px-2 py-1 text-center">Bil</th>
@@ -1038,6 +1038,12 @@ export default function MonthlyClassReportPage() {
             -webkit-backdrop-filter: none !important;
           }
 
+          .report-shell,
+          .report-shell * {
+            box-shadow: none !important;
+            text-shadow: none !important;
+          }
+
           main > div {
             border: none !important;
             padding: 0 !important;
@@ -1078,6 +1084,12 @@ export default function MonthlyClassReportPage() {
           .print-only table {
             min-width: 0 !important;
             width: 100% !important;
+          }
+
+          .report-shell [class*="overflow-auto"],
+          .report-shell [class*="overflow-x-auto"],
+          .report-shell [class*="overflow-y-auto"] {
+            overflow: visible !important;
           }
 
           table {
