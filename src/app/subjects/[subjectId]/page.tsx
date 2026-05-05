@@ -55,6 +55,7 @@ function canonicalSubjectKey(value: string) {
   if (cleaned.includes("bahasaarab") || cleaned === "ba") return "bahasaarab";
   if (cleaned.includes("pendidikanislam") || cleaned === "pi") return "pendidikanislam";
   if (cleaned.includes("pendidikansenivisual") || cleaned === "psv") return "psv";
+  if (cleaned.includes("sejarah") || cleaned === "sj") return "sejarah";
   if (cleaned.includes("pendidikanjasmani") || cleaned === "pj") return "pj";
   if (cleaned.includes("pendidikankesihatan") || cleaned === "pk") return "pk";
 
@@ -74,6 +75,8 @@ function canonicalSubjectKey(value: string) {
     matematik: "matematik",
     sn: "sains",
     sains: "sains",
+    sj: "sejarah",
+    sejarah: "sejarah",
   };
 
   return aliasMap[cleaned] ?? cleaned;

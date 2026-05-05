@@ -44,6 +44,15 @@ type SkillItem = {
   display_order: number;
 };
 
+type AssessmentSummaryRow = {
+  student_id: string;
+  subject_id: string;
+  skill_id: string;
+  mastery_level: MasteryLevel;
+  recorded_at: string;
+  created_at: string;
+};
+
 type MasteryLevel = "TP1" | "TP2" | "TP3" | "TP4" | "TP5" | "TP6";
 
 const TP_OPTIONS: Array<{ value: ""; label: "Belum Taksir" } | { value: MasteryLevel; label: MasteryLevel }> = [
@@ -130,6 +139,7 @@ export default function ClassStudentsPage() {
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [classInfo, setClassInfo] = useState<ClassInfo | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
+  const [studentTpSummary, setStudentTpSummary] = useState<Record<string, string>>({});
   const [subjects, setSubjects] = useState<SubjectItem[]>([]);
   const [classSubjectMaps, setClassSubjectMaps] = useState<ClassSubjectMap[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
@@ -162,6 +172,77 @@ export default function ClassStudentsPage() {
 
     const rows = (data ?? []) as Student[];
     setStudents(sortStudentsByNameRule(rows));
+
+    const { data: assessmentRows, error: assessmentError } = await supabase
+      .from("assessments")
+      .select("student_id, subject_id, skill_id, mastery_level, recorded_at, created_at")
+      .eq("workspace_id", workspaceId)
+      .eq("class_id", targetClassId);
+
+    if (assessmentError) {
+      setError(assessmentError.message);
+      return;
+    }
+
+    const latestByStudentSkill = new Map<string, AssessmentSummaryRow>();
+    for (const row of (assessmentRows ?? []) as AssessmentSummaryRow[]) {
+      const key = `${row.student_id}::${row.subject_id}::${row.skill_id}`;
+      const existing = latestByStudentSkill.get(key);
+      if (!existing) {
+        latestByStudentSkill.set(key, row);
+        continue;
+      }
+
+      const existingRecorded = new Date(existing.recorded_at).getTime();
+      const currentRecorded = new Date(row.recorded_at).getTime();
+      if (currentRecorded > existingRecorded) {
+        latestByStudentSkill.set(key, row);
+        continue;
+      }
+      if (currentRecorded === existingRecorded) {
+        const existingCreated = new Date(existing.created_at).getTime();
+        const currentCreated = new Date(row.created_at).getTime();
+        if (currentCreated >= existingCreated) {
+          latestByStudentSkill.set(key, row);
+        }
+      }
+    }
+
+    const tpRank: Record<MasteryLevel, number> = {
+      TP1: 1,
+      TP2: 2,
+      TP3: 3,
+      TP4: 4,
+      TP5: 5,
+      TP6: 6,
+    };
+
+    const countsByStudent: Record<string, Record<MasteryLevel, number>> = {};
+    for (const row of latestByStudentSkill.values()) {
+      if (!countsByStudent[row.student_id]) {
+        countsByStudent[row.student_id] = { TP1: 0, TP2: 0, TP3: 0, TP4: 0, TP5: 0, TP6: 0 };
+      }
+      countsByStudent[row.student_id][row.mastery_level] += 1;
+    }
+
+    const summaryMap: Record<string, string> = {};
+    for (const student of rows) {
+      const counts = countsByStudent[student.id];
+      if (!counts) {
+        summaryMap[student.id] = "TP terkumpul: Belum ada rekod";
+        continue;
+      }
+      const levels = Object.keys(counts) as MasteryLevel[];
+      const total = levels.reduce((sum, level) => sum + (counts[level] ?? 0), 0);
+      const dominant = levels.sort((a, b) => {
+        const byCount = (counts[b] ?? 0) - (counts[a] ?? 0);
+        if (byCount !== 0) return byCount;
+        return tpRank[b] - tpRank[a];
+      })[0];
+      summaryMap[student.id] = `${total} kemahiran dinilai | TP dominan: ${dominant}`;
+    }
+
+    setStudentTpSummary(summaryMap);
   };
 
   const loadSubjects = async (workspaceId: string) => {
@@ -1098,7 +1179,7 @@ export default function ClassStudentsPage() {
                       {student.full_name}
                     </p>
                     <p className="mt-2 text-sm leading-5 text-slate-600">
-                      No: {student.student_no ?? "-"} | Gender: {student.gender ?? "-"}
+                      {studentTpSummary[student.id] ?? "TP terkumpul: Belum ada rekod"}
                     </p>
                   </button>
                 ))}
