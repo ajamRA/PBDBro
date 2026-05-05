@@ -20,6 +20,8 @@ export type Question = {
   difficulty?: "mudah" | "sederhana" | "tinggi";
   imageUrl?: string;
   imageAlt?: string;
+  topic?: string;
+  generatedByAi?: boolean;
 };
 
 export const SKILLS: Array<{ id: SkillId; name: string }> = [

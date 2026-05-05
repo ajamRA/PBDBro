@@ -30,6 +30,7 @@ const SUBJECT_PRESETS = [
   { name: "Bahasa Arab", code: "BA" },
   { name: "Pendidikan Islam", code: "PI" },
   { name: "Pendidikan Seni Visual", code: "PSV" },
+  { name: "Reka Bentuk dan Teknologi", code: "RBT" },
 ] as const;
 
 const YEAR_PRESETS = ["Tahun 1", "Tahun 2", "Tahun 3", "Tahun 4", "Tahun 5", "Tahun 6"] as const;

@@ -1,0 +1,26 @@
+
+> new-project@1.0.0 dev
+> next dev --hostname 127.0.0.1 --port 3000
+
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+- Environments: .env.local
+✓ Ready in 516ms
+
+ GET /quiz 200 in 369ms (next.js: 180ms, application-code: 189ms)
+ POST /api/quiz/generate 200 in 12.6s (next.js: 79ms, application-code: 12.5s)
+ POST /api/quiz/generate 200 in 16.4s (next.js: 3ms, application-code: 16.4s)
+ GET /quiz 200 in 165ms (next.js: 127ms, application-code: 38ms)
+✓ Compiled in 45ms
+ GET /quiz 200 in 60ms (next.js: 39ms, application-code: 21ms)
+ POST /api/quiz/generate 200 in 11.2s (next.js: 41ms, application-code: 11.2s)
+ GET /quiz 200 in 111ms (next.js: 2ms, application-code: 108ms)
+✓ Compiled in 41ms
+ GET /quiz 200 in 74ms (next.js: 39ms, application-code: 36ms)
+ POST /api/quiz/generate 502 in 12.2s (next.js: 20ms, application-code: 12.2s)
+ POST /api/quiz/generate 502 in 12.8s (next.js: 4ms, application-code: 12.8s)
+ GET /quiz 200 in 69ms (next.js: 38ms, application-code: 31ms)
+ POST /api/quiz/generate 200 in 10.4s (next.js: 21ms, application-code: 10.4s)
+ GET /quiz 200 in 91ms (next.js: 3ms, application-code: 88ms)
+ POST /api/quiz/generate 200 in 13.7s (next.js: 4ms, application-code: 13.7s)
