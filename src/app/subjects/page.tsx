@@ -30,6 +30,7 @@ const SUBJECT_PRESETS = [
   { name: "Bahasa Arab", code: "BA" },
   { name: "Pendidikan Islam", code: "PI" },
   { name: "Pendidikan Seni Visual", code: "PSV" },
+  { name: "Sejarah", code: "SJ" },
   { name: "Reka Bentuk dan Teknologi", code: "RBT" },
 ] as const;
 
